@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Central de Monitoramento Inteligente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Monitoramento com IA</h1>
+        <p>Visualização das cameras</p>
+    </header>
+    <main class="container">
+        <aside class="menu-cameras">
+            <h2>Câmeras</h2>
+            <div class="tabs" id="abas"></div>
+        </aside>
+        <section class="visualizacao-camera">
+            <div class="grade-cameras" id="grade-cameras">
+                <!-- Espaço das câmeras -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let paginaAtual = 1;
+        const camerasPorPagina = 10;
+        const totalCameras = 100;
+        const totalPaginas = Math.ceil(totalCameras / camerasPorPagina);
+
+        function mudarPagina(pagina) {
+            paginaAtual = pagina;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('ativa'));
+            document.getElementById('tab' + pagina).classList.add('ativa');
+            renderizarGrade();
+        }
+
+        function renderizarAbas() {
+            const container = document.getElementById('abas');
+            container.innerHTML = '';
+            for (let i = 1; i <= totalPaginas; i++) {
+                const botao = document.createElement('button');
+                botao.id = 'tab' + i;
+                botao.textContent = `${(i - 1) * camerasPorPagina + 1}–${i * camerasPorPagina}`;
+                botao.className = 'tab';
+                botao.onclick = () => mudarPagina(i);
+                container.appendChild(botao);
+            }
+        }
+
+        function renderizarGrade() {
+
+            setInterval(() => {
+    document.querySelectorAll('.camera-video').forEach((img, idx) => {
+        const id = (paginaAtual - 1) * camerasPorPagina + idx + 1;
+        img.src = `/snapshot/${id}?t=${new Date().getTime()}`;
+    });
+}, 5000); // atualiza a cada 5 segundos
+
+            const grade = document.getElementById('grade-cameras');
+            grade.innerHTML = '';
+            const inicio = (paginaAtual - 1) * camerasPorPagina + 1;
+            const fim = Math.min(paginaAtual * camerasPorPagina, totalCameras);
+
+            for (let i = inicio; i <= fim; i++) {
+                const container = document.createElement('div');
+                container.className = 'camera-box';
+
+                const titulo = document.createElement('p');
+                titulo.textContent = `Câmera ${i}`;
+                titulo.className = 'camera-label';
+
+                const imagem = document.createElement('img');
+                imagem.src = `/snapshot/${i}?t=${new Date().getTime()}`;
+                imagem.alt = `Camera ${i}`;
+                imagem.className = 'camera-video';
+
+                imagem.onload = () => {imagem.classList.add('loaded');};
+
+                container.appendChild(titulo);
+                container.appendChild(imagem);
+
+                 // ALERTA SIMULADO PARA A CÂMERA 13
+    if (i === 13) {
+        const alerta = document.createElement('div');
+        alerta.textContent = '🚨 Movimento suspeito detectado!';
+        alerta.className = 'alerta-camera';
+        container.appendChild(alerta);
+    }
+
+                grade.appendChild(container);
+            }
+        }
+
+        renderizarAbas();
+        mudarPagina(1);
+    </script>
+</body>
+</html>
