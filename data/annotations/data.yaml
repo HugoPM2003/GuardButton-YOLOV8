@@ -1,0 +1,6 @@
+train: C:/Users/Bruno/Desktop/smart_security/data/annotations/images/train
+val: C:/Users/Bruno/Desktop/smart_security/data/annotations/images/val
+test: C:/Users/Bruno/Desktop/smart_security/data/annotations/images/test
+
+nc: 2
+names: ['knife', 'pistol']
